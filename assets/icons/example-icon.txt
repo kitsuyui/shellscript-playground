@@ -1,0 +1,5 @@
+# example-icon.png is downloaded from https://iconduck.com/licenses/cc0
+Size342 bytes
+Setlicons Icon Set
+StylesThin 224
+LicenseCreative Commons Zero v1.0 Universal
