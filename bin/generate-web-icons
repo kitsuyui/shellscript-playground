@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+
+# Generate various web icons by given image file
+# Usage: ./icons.sh <image_file>.<ext>
+# Output: <image_file>.tar.gz
+# Dependencies: ImageMagick
+# Note: The input image file should be square.
+# The output tarball contains the following files:
+# - favicon16.ico
+# - favicon32.ico
+# - favicon48.ico
+# - favicon64.ico
+# - apple-touch-icon57.png
+# - apple-touch-icon60.png
+# - apple-touch-icon72.png
+# - apple-touch-icon76.png
+# - apple-touch-icon114.png
+# - apple-touch-icon120.png
+# - apple-touch-icon144.png
+# - apple-touch-icon152.png
+# - apple-touch-icon180.png
+# - favicon16.png
+# - favicon32.png
+# - favicon48.png
+# - favicon96.png
+# - favicon192.png
+
+# HTML
+# <link rel="icon" href="favicon16.ico" type="image/x-icon" />
+# <link rel="icon" href="favicon32.ico" type="image/x-icon" />
+# <link rel="icon" href="favicon48.ico" type="image/x-icon" />
+# <link rel="icon" href="favicon64.ico" type="image/x-icon" />
+# <link rel="apple-touch-icon" href="apple-touch-icon57.png" sizes="57x57" />
+# <link rel="apple-touch-icon" href="apple-touch-icon60.png" sizes="60x60" />
+# <link rel="apple-touch-icon" href="apple-touch-icon72.png" sizes="72x72" />
+# <link rel="apple-touch-icon" href="apple-touch-icon76.png" sizes="76x76" />
+# <link rel="apple-touch-icon" href="apple-touch-icon114.png" sizes="114x114" />
+# <link rel="apple-touch-icon" href="apple-touch-icon120.png" sizes="120x120" />
+# <link rel="apple-touch-icon" href="apple-touch-icon144.png" sizes="144x144" />
+# <link rel="apple-touch-icon" href="apple-touch-icon152.png" sizes="152x152" />
+# <link rel="apple-touch-icon" href="apple-touch-icon180.png" sizes="180x180" />
+# <link rel="icon" href="favicon16.png" sizes="16x16" />
+# <link rel="icon" href="favicon32.png" sizes="32x32" />
+# <link rel="icon" href="favicon48.png" sizes="48x48" />
+# <link rel="icon" href="favicon96.png" sizes="96x96" />
+# <link rel="icon" href="favicon192.png" sizes="192x192"> /　
+
+set -euo pipefail
+
+main() {
+  target_file="$1"
+  target_name=$(get_name_without_extension "$target_file")
+  workdir_path=$(generate_icons_in_tmpdir "$target_file")
+  generate_tarball_name "$target_name" "$workdir_path" > "$target_name.tar.gz"
+  # clean up
+  rm -rf "$workdir_path"
+}
+
+generate_icons_in_path() {
+  target_path="$1"
+  icons_dir="$2"
+  resize_and_convert "$target_path" "${icons_dir}/favicon.ico" 16
+  resize_and_convert "$target_path" "${icons_dir}/favicon16.ico" 16
+  resize_and_convert "$target_path" "${icons_dir}/favicon32.ico" 32
+  resize_and_convert "$target_path" "${icons_dir}/favicon48.ico" 48
+  resize_and_convert "$target_path" "${icons_dir}/favicon64.ico" 64
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon57.png" 57
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon60.png" 60
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon72.png" 72
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon76.png" 76
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon114.png" 114
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon120.png" 120
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon144.png" 144
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon152.png" 152
+  resize_and_convert "$target_path" "${icons_dir}/apple-touch-icon180.png" 180
+  resize_and_convert "$target_path" "${icons_dir}/favicon16.png" 16
+  resize_and_convert "$target_path" "${icons_dir}/favicon32.png" 32
+  resize_and_convert "$target_path" "${icons_dir}/favicon48.png" 48
+  resize_and_convert "$target_path" "${icons_dir}/favicon96.png" 96
+  resize_and_convert "$target_path" "${icons_dir}/favicon192.png" 192
+  echo "$icons_dir"
+}
+
+generate_icons_in_tmpdir() {
+  target_file="$1"
+  workdir=$(mktemp -d)
+  generate_icons_in_path "$target_file" "$workdir"
+}
+
+generate_tarball_name() {
+  # BSD tar has -s option, but GNU tar does not
+  # GNU tar has --transform option, but BSD tar does not
+  # So, we need to use this workaround
+  name="$1"
+  target_path="$2"
+  tarball_name="${name}.tar.gz"
+  workdir=$(mktemp -d)
+  mkdir -p "$workdir/$name"
+  tarball_path="${workdir}/${tarball_name}"
+  archive_path="${workdir}/${name}/"
+  cp -pR "$target_path/"* "$archive_path"
+  cd "$workdir"
+  tar -C "$workdir" -czf - "$name"
+  rm -rf "$workdir"
+  cd - > /dev/null
+}
+
+magick_command() {
+  # ImageMagick 7 uses `magick` command
+  # But older versions use `convert` command
+  if command -v magick > /dev/null; then
+    echo "magick convert"
+  else
+    echo "convert"
+  fi
+}
+
+resize_and_convert()  {
+  target_file="$1"
+  convert_to="$2"
+  size="$3"
+  $(magick_command) "$target_file" -resize "${size}x${size}" "$convert_to"
+}
+
+get_name_without_extension() {
+  name=$(basename "$1")
+  echo "${name%.*}"
+}
+
+main "$@"
