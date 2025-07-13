@@ -43,7 +43,7 @@
 # <link rel="icon" href="favicon32.png" sizes="32x32" />
 # <link rel="icon" href="favicon48.png" sizes="48x48" />
 # <link rel="icon" href="favicon96.png" sizes="96x96" />
-# <link rel="icon" href="favicon192.png" sizes="192x192"> /　
+# <link rel="icon" href="favicon192.png" sizes="192x192"> /
 
 set -euo pipefail
 
@@ -51,7 +51,7 @@ main() {
   target_file="$1"
   target_name=$(get_name_without_extension "$target_file")
   workdir_path=$(generate_icons_in_tmpdir "$target_file")
-  generate_tarball_name "$target_name" "$workdir_path" > "$target_name.tar.gz"
+  generate_tarball_name "$target_name" "$workdir_path" >"$target_name.tar.gz"
   # clean up
   rm -rf "$workdir_path"
 }
@@ -100,20 +100,20 @@ generate_tarball_name() {
   cd "$workdir"
   tar -C "$workdir" -czf - "$name"
   rm -rf "$workdir"
-  cd - > /dev/null
+  cd - >/dev/null
 }
 
 magick_command() {
   # ImageMagick 7 uses `magick` command
   # But older versions use `convert` command
-  if command -v magick > /dev/null; then
+  if command -v magick >/dev/null; then
     echo "magick"
   else
     echo "convert"
   fi
 }
 
-resize_and_convert()  {
+resize_and_convert() {
   target_file="$1"
   convert_to="$2"
   size="$3"

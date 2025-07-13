@@ -9,7 +9,7 @@ icon_file="$PROJECT_ROOT/assets/icons/example-icon.png"
 assert_tar_contains_target_file() {
   target_tarball="$1"
   target_file="$2"
-  if ! tar -ztf "$target_tarball" "$target_file" &> /dev/null; then
+  if ! tar -ztf "$target_tarball" "$target_file" &>/dev/null; then
     echo "Failed to generate web icons"
     echo "Tarball file not found: $target_file"
     exit 1
