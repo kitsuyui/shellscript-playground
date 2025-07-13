@@ -109,7 +109,7 @@ magick_command() {
   # ImageMagick 7 uses `magick` command
   # But older versions use `convert` command
   if command -v magick > /dev/null; then
-    echo "magick convert"
+    echo "magick"
   else
     echo "convert"
   fi
