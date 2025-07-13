@@ -10,6 +10,7 @@ if [ "$result" != "" ]; then
     exit 1
 fi
 
+# shellcheck disable=SC2016
 result=$(env-run sh -c 'echo $FOO')
 if [ "$result" != "bar" ]; then
     echo "Error: FOO must be bar"

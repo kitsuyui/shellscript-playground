@@ -93,10 +93,8 @@ generate_tarball_name() {
   # So, we need to use this workaround
   name="$1"
   target_path="$2"
-  tarball_name="${name}.tar.gz"
   workdir=$(mktemp -d)
   mkdir -p "$workdir/$name"
-  tarball_path="${workdir}/${tarball_name}"
   archive_path="${workdir}/${name}/"
   cp -pR "$target_path/"* "$archive_path"
   cd "$workdir"

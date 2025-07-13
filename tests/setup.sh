@@ -5,6 +5,9 @@ set -euo pipefail
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
 # Clear all environment variables before tests
+
+# word splitting is intended here to unset all variables except PROJECT_ROOT
+# shellcheck disable=SC2046
 unset $(env | grep -v 'PROJECT_ROOT' | cut -d= -f1)
 PATH='/bin/:/usr/bin'
 PATH="$PATH:$PROJECT_ROOT/bin"
