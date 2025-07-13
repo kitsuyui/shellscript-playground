@@ -7,10 +7,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pollenjp/setup-shfmt@v1
+
       - name: Install ImageMagick for generate-web-icons
         run: sudo apt-get install -y imagemagick
 
-      - name: ShellCheck
+      - name: check format with shfmt
+        run: ./tests/shfmt.sh
+
+      - name: lint with shellcheck
         run: ./tests/shellcheck.sh
 
       - name: Test
