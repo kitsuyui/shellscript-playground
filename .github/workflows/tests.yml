@@ -10,7 +10,10 @@ jobs:
       - name: Install ImageMagick for generate-web-icons
         run: sudo apt-get install -y imagemagick
 
-      - name: ShellCheck
+      - name: check format with shfmt
+        run: ./tests/shfmt.sh
+
+      - name: lint with shellcheck
         run: ./tests/shellcheck.sh
 
       - name: Test
