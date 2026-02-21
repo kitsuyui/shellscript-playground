@@ -1,0 +1,17 @@
+# https://github.com/k1LoW/octocov?tab=readme-ov-file#configuration
+codeToTestRatio:
+  code:
+    - "bin/**/*.sh"
+  test:
+    - "tests/**/*.sh"
+testExecutionTime:
+  if: true
+diff:
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}
+comment:
+  if: is_pull_request
+report:
+  if: is_default_branch
+  datastores:
+    - artifact://${GITHUB_REPOSITORY}

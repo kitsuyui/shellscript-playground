@@ -1,0 +1,38 @@
+name: octocov
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  octocov:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pollenjp/setup-shfmt@v1
+
+      - name: Install ImageMagick for generate-web-icons
+        run: sudo apt-get install -y imagemagick
+
+      - name: check format with shfmt
+        run: ./tests/shfmt.sh
+
+      - name: lint with shellcheck
+        run: ./tests/shellcheck.sh
+
+      - name: Test
+        run: ./tests/all.sh
+
+      - name: Report coverage with octocov
+        uses: k1LoW/octocov-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: .octocov.yml

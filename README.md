@@ -1,5 +1,7 @@
 # shellscript-playground
 
+![Coverage](https://raw.githubusercontent.com/kitsuyui/octocov-central/main/badges/kitsuyui/shellscript-playground/coverage.svg)
+
 ## ja: 概要
 
 このリポジトリは、シェルスクリプトの練習・実験用のリポジトリです。
