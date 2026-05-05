@@ -1,13 +1,17 @@
 name: Test
 on:
   - pull_request
+
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: pollenjp/setup-shfmt@v1
+      - uses: pollenjp/setup-shfmt@2d2d74023ad2fb047734b97658e911e49f4dfc73
 
       - name: Install ImageMagick for generate-web-icons
         run: sudo apt-get install -y imagemagick
