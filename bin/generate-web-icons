@@ -47,7 +47,23 @@
 
 set -euo pipefail
 
+usage() {
+  echo "Usage: generate-web-icons <image_file>"
+}
+
 main() {
+  if [ "$#" -ne 1 ]; then
+    usage >&2
+    exit 64
+  fi
+
+  case "$1" in
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  esac
+
   local target_file="$1"
   local target_name
   local workdir_path

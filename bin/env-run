@@ -5,6 +5,22 @@
 
 set -euo pipefail
 
+usage() {
+  echo "Usage: env-run <command> [args...]"
+}
+
+if [ "$#" -eq 0 ]; then
+  usage >&2
+  exit 64
+fi
+
+case "$1" in
+-h | --help)
+  usage
+  exit 0
+  ;;
+esac
+
 # Load environment variables from .env file if it exists
 # shellcheck disable=SC1091
 if [[ -f .env ]]; then
