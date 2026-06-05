@@ -56,16 +56,20 @@ main() {
     usage >&2
     exit 64
   fi
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+  fi
+  if [[ $# -ne 1 ]]; then
+    usage >&2
+    exit 64
+  fi
   case "$1" in
   -h | --help)
     usage
     exit 0
     ;;
   esac
-  if [[ $# -ne 1 ]]; then
-    usage >&2
-    exit 64
-  fi
   local target_file="$1"
   local target_name
   local workdir_path
