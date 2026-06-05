@@ -51,7 +51,9 @@ main() {
   target_file="$1"
   target_name=$(get_name_without_extension "$target_file")
   workdir_path=$(generate_icons_in_tmpdir "$target_file")
+  trap 'rm -f "${target_name}.tar.gz"' ERR
   generate_tarball_name "$target_name" "$workdir_path" >"$target_name.tar.gz"
+  trap - ERR
   # clean up
   rm -rf "$workdir_path"
 }
