@@ -5,6 +5,22 @@
 
 set -euo pipefail
 
+usage() {
+  echo "Usage: env-run <command> [args...]"
+}
+
+if [ "$#" -eq 0 ]; then
+  usage >&2
+  exit 64
+fi
+
+case "$1" in
+-h | --help)
+  usage
+  exit 0
+  ;;
+esac
+
 # Load environment variables from .env in the current working directory, if present.
 # Parses KEY=VALUE lines only; arbitrary shell code is not executed.
 # If .env is absent a warning is printed to stderr and the command runs unchanged.
