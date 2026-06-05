@@ -98,7 +98,7 @@ generate_tarball_name() {
   archive_path="${workdir}/${name}/"
   cp -pR "$target_path/"* "$archive_path"
   cd "$workdir"
-  tar -C "$workdir" -czf - "$name"
+  tar -C "$workdir" -cf - "$name" | gzip -n
   rm -rf "$workdir"
   cd - >/dev/null
 }
