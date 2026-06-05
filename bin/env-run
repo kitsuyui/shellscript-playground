@@ -5,11 +5,16 @@
 
 set -euo pipefail
 
-# Load environment variables from .env file if it exists
+# Load environment variables from .env in the current working directory, if present.
+# set -a causes every variable assigned while sourcing .env — including PATH — to be
+# automatically exported to the child process.
+# If .env is absent a warning is printed to stderr and the command runs unchanged.
 # shellcheck disable=SC1091
 if [[ -f .env ]]; then
   set -a
   source .env
   set +a
+else
+  echo "env-run: .env not found in $(pwd); running without loading environment file" >&2
 fi
 exec "$@"
