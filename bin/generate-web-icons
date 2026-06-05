@@ -84,7 +84,9 @@ generate_icons_in_path() {
 generate_icons_in_tmpdir() {
   target_file="$1"
   workdir=$(mktemp -d)
+  trap 'rm -rf "$workdir"' EXIT
   generate_icons_in_path "$target_file" "$workdir"
+  trap - EXIT
 }
 
 generate_tarball_name() {
@@ -94,12 +96,15 @@ generate_tarball_name() {
   name="$1"
   target_path="$2"
   workdir=$(mktemp -d)
+  # shellcheck disable=SC2064
+  trap "rm -rf -- $(printf '%q' "$workdir") $(printf '%q' "$target_path")" EXIT
   mkdir -p "$workdir/$name"
   archive_path="${workdir}/${name}/"
   cp -pR "$target_path/"* "$archive_path"
   cd "$workdir"
   tar -C "$workdir" -czf - "$name"
   rm -rf "$workdir"
+  trap - EXIT
   cd - >/dev/null
 }
 
