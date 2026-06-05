@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Generate various web icons by given image file
-# Usage: ./icons.sh <image_file>.<ext>
+# Usage: ./generate-web-icons <image_file>.<ext>
 # Output: <image_file>.tar.gz
 # Dependencies: ImageMagick
 # Note: The input image file should be square.
@@ -105,11 +105,9 @@ generate_tarball_name() {
   mkdir -p "$workdir/$name"
   local archive_path="${workdir}/${name}/"
   cp -pR "$target_path/"* "$archive_path"
-  cd "$workdir"
   tar -C "$workdir" -czf - "$name"
   rm -rf "$workdir"
   trap - EXIT
-  cd - >/dev/null
 }
 
 magick_command() {
