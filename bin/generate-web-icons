@@ -48,7 +48,9 @@
 set -euo pipefail
 
 main() {
-  target_file="$1"
+  local target_file="$1"
+  local target_name
+  local workdir_path
   target_name=$(get_name_without_extension "$target_file")
   workdir_path=$(generate_icons_in_tmpdir "$target_file")
   generate_tarball_name "$target_name" "$workdir_path" >"$target_name.tar.gz"
@@ -57,8 +59,8 @@ main() {
 }
 
 generate_icons_in_path() {
-  target_path="$1"
-  icons_dir="$2"
+  local target_path="$1"
+  local icons_dir="$2"
   resize_and_convert "$target_path" "${icons_dir}/favicon.ico" 16
   resize_and_convert "$target_path" "${icons_dir}/favicon16.ico" 16
   resize_and_convert "$target_path" "${icons_dir}/favicon32.ico" 32
@@ -82,7 +84,8 @@ generate_icons_in_path() {
 }
 
 generate_icons_in_tmpdir() {
-  target_file="$1"
+  local target_file="$1"
+  local workdir
   workdir=$(mktemp -d)
   trap 'rm -rf "$workdir"' EXIT
   generate_icons_in_path "$target_file" "$workdir"
@@ -93,13 +96,14 @@ generate_tarball_name() {
   # BSD tar has -s option, but GNU tar does not
   # GNU tar has --transform option, but BSD tar does not
   # So, we need to use this workaround
-  name="$1"
-  target_path="$2"
+  local name="$1"
+  local target_path="$2"
+  local workdir
   workdir=$(mktemp -d)
   # shellcheck disable=SC2064
   trap "rm -rf -- $(printf '%q' "$workdir") $(printf '%q' "$target_path")" EXIT
   mkdir -p "$workdir/$name"
-  archive_path="${workdir}/${name}/"
+  local archive_path="${workdir}/${name}/"
   cp -pR "$target_path/"* "$archive_path"
   cd "$workdir"
   tar -C "$workdir" -czf - "$name"
@@ -119,13 +123,14 @@ magick_command() {
 }
 
 resize_and_convert() {
-  target_file="$1"
-  convert_to="$2"
-  size="$3"
+  local target_file="$1"
+  local convert_to="$2"
+  local size="$3"
   $(magick_command) "$target_file" -resize "${size}x${size}" "$convert_to"
 }
 
 get_name_without_extension() {
+  local name
   name=$(basename "$1")
   echo "${name%.*}"
 }
