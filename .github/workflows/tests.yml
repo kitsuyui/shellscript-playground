@@ -14,7 +14,9 @@ jobs:
       - uses: pollenjp/setup-shfmt@2d2d74023ad2fb047734b97658e911e49f4dfc73
 
       - name: Install ImageMagick for generate-web-icons
-        run: sudo apt-get install -y imagemagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
       - name: check format with shfmt
         run: ./tests/shfmt.sh
