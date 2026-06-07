@@ -24,6 +24,16 @@ However, I will avoid making too much effort for compatibility and supplement it
 
 If possible, I will write tests.
 
+## ja: 依存関係
+
+`generate-web-icons` は ImageMagick 7 の `magick` と ImageMagick 6 の `convert` をサポートします。
+`magick` が存在する場合は優先して使い、 Ubuntu の `imagemagick` パッケージとこのリポジトリの CI ベースラインが ImageMagick 6 を提供している間は `convert` のフォールバックを維持します。
+
+## en: Dependencies
+
+`generate-web-icons` supports ImageMagick 7 through `magick` and ImageMagick 6 through `convert`.
+It prefers `magick` when available, and keeps the `convert` fallback while Ubuntu's `imagemagick` package and this repository's CI baseline provide ImageMagick 6.
+
 ## Installation
 
 ```bash
