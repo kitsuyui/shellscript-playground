@@ -53,7 +53,9 @@ main() {
   local workdir_path
   target_name=$(get_name_without_extension "$target_file")
   workdir_path=$(generate_icons_in_tmpdir "$target_file")
-  generate_tarball_name "$target_name" "$workdir_path" >"$target_name.tar.gz"
+  tmp_output=$(mktemp "${target_name}.tar.gz.XXXXXX")
+  generate_tarball_name "$target_name" "$workdir_path" >"$tmp_output"
+  mv "$tmp_output" "${target_name}.tar.gz"
   # clean up
   rm -rf "$workdir_path"
 }
