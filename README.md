@@ -36,6 +36,21 @@ Add the following to your `.bashrc` or `.zshrc`:
 export PATH="$PATH:/path/to/shellscript-playground/bin"
 ```
 
+## Development
+
+Install [lefthook](https://github.com/evilmartians/lefthook) and then run:
+
+```bash
+lefthook install
+```
+
+This sets up the following Git hooks:
+
+- **pre-commit**: runs `./tests/shfmt.sh` (format check) and `./tests/shellcheck.sh` (lint)
+- **pre-push**: runs `./tests/shfmt.sh`, `./tests/shellcheck.sh`, and `./tests/all.sh` (full test suite)
+
+CI runs the full suite (`shfmt`, `shellcheck`, and `all.sh`) on every pull request.
+
 ## LICENSE
 
 MIT License
