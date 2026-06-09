@@ -109,7 +109,7 @@ generate_tarball_name() {
   cp -R "$target_path/"* "$archive_path"
   find "$archive_path" -exec touch -t 197001010000 {} \;
   cd "$workdir"
-  tar -C "$workdir" -czf - "$name"
+  tar -C "$workdir" -cf - "$name" | gzip -n
   rm -rf "$workdir"
   trap - EXIT
   cd - >/dev/null
