@@ -106,7 +106,8 @@ generate_tarball_name() {
   trap "rm -rf -- $(printf '%q' "$workdir") $(printf '%q' "$target_path")" EXIT
   mkdir -p "$workdir/$name"
   local archive_path="${workdir}/${name}/"
-  cp -pR "$target_path/"* "$archive_path"
+  cp -R "$target_path/"* "$archive_path"
+  find "$archive_path" -exec touch -t 197001010000 {} \;
   cd "$workdir"
   tar -C "$workdir" -czf - "$name"
   rm -rf "$workdir"
