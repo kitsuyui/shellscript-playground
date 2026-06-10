@@ -5,8 +5,9 @@
 
 set -euo pipefail
 
-# Load environment variables from .env file if it exists
-# Parses KEY=VALUE lines only; arbitrary shell code is not executed
+# Load environment variables from .env in the current working directory, if present.
+# Parses KEY=VALUE lines only; arbitrary shell code is not executed.
+# If .env is absent a warning is printed to stderr and the command runs unchanged.
 if [[ -f .env ]]; then
   while IFS= read -r line || [[ -n "$line" ]]; do
     [[ "$line" =~ ^[[:space:]]*# ]] && continue
@@ -18,5 +19,7 @@ if [[ -f .env ]]; then
       export "${key}=${value}"
     fi
   done <.env
+else
+  echo "env-run: .env not found in $(pwd); running without loading environment file" >&2
 fi
 exec "$@"

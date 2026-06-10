@@ -1,0 +1,15 @@
+pre-commit:
+  commands:
+    shfmt:
+      run: for name in $(env | sed -n 's/^\(GIT_[A-Za-z0-9_]*\)=.*/\1/p'); do unset "$name"; done; ./tests/shfmt.sh
+    shellcheck:
+      run: for name in $(env | sed -n 's/^\(GIT_[A-Za-z0-9_]*\)=.*/\1/p'); do unset "$name"; done; ./tests/shellcheck.sh
+
+pre-push:
+  commands:
+    shfmt:
+      run: for name in $(env | sed -n 's/^\(GIT_[A-Za-z0-9_]*\)=.*/\1/p'); do unset "$name"; done; ./tests/shfmt.sh
+    shellcheck:
+      run: for name in $(env | sed -n 's/^\(GIT_[A-Za-z0-9_]*\)=.*/\1/p'); do unset "$name"; done; ./tests/shellcheck.sh
+    all:
+      run: for name in $(env | sed -n 's/^\(GIT_[A-Za-z0-9_]*\)=.*/\1/p'); do unset "$name"; done; ./tests/all.sh
