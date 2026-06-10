@@ -3,7 +3,7 @@
 # Generate various web icons by given image file
 # Usage: ./icons.sh <image_file>.<ext>
 # Output: <image_file>.tar.gz
-# Dependencies: ImageMagick
+# Dependencies: ImageMagick 6 (`convert`) or ImageMagick 7 (`magick`)
 # Note: The input image file should be square.
 # The output tarball contains the following files:
 # - favicon16.ico
@@ -125,8 +125,10 @@ generate_tarball_name() {
 }
 
 magick_command() {
-  # ImageMagick 7 uses `magick` command
-  # But older versions use `convert` command
+  # Support ImageMagick 7 with `magick` and ImageMagick 6 with `convert`.
+  # Keep the `convert` fallback while Ubuntu's packaged imagemagick and CI
+  # baseline provide ImageMagick 6. Remove it only after supported runtime
+  # images provide `magick`.
   if command -v magick >/dev/null; then
     echo "magick"
   else

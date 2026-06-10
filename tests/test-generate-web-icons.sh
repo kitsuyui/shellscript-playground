@@ -56,4 +56,37 @@ assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon192.png"
 
 set -e
 
+rm -f "$tobe_tarball"
+
+fake_bin="$WORK_DIR/fake-bin"
+magick_calls="$WORK_DIR/magick-calls.log"
+mkdir -p "$fake_bin"
+
+cat >"$fake_bin/magick" <<'BASH'
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf '%s\n' "$*" >>"$MAGICK_CALL_LOG"
+target_file="${@: -1}"
+mkdir -p "$(dirname "$target_file")"
+printf 'fake icon\n' >"$target_file"
+BASH
+chmod +x "$fake_bin/magick"
+
+MAGICK_CALL_LOG="$magick_calls" PATH="$fake_bin:$PROJECT_ROOT/bin:/bin:/usr/bin" generate-web-icons "$icon_file"
+
+if [ ! -f "$tobe_tarball" ]; then
+  echo "Failed to generate web icons with magick command"
+  echo "Tarball file not found: $tobe_tarball"
+  exit 1
+fi
+
+if [ ! -s "$magick_calls" ]; then
+  echo "Failed to use magick command"
+  exit 1
+fi
+
+assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon.ico"
+assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon192.png"
+
 source "$PROJECT_ROOT/tests/teardown.sh"
