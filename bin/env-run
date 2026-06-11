@@ -6,14 +6,19 @@
 set -euo pipefail
 
 # Load environment variables from .env in the current working directory, if present.
-# set -a causes every variable assigned while sourcing .env — including PATH — to be
-# automatically exported to the child process.
+# Parses KEY=VALUE lines only; arbitrary shell code is not executed.
 # If .env is absent a warning is printed to stderr and the command runs unchanged.
-# shellcheck disable=SC1091
 if [[ -f .env ]]; then
-  set -a
-  source .env
-  set +a
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+    [[ "$line" != *=* ]] && continue
+    key="${line%%=*}"
+    value="${line#*=}"
+    if [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      export "${key}=${value}"
+    fi
+  done <.env
 else
   echo "env-run: .env not found in $(pwd); running without loading environment file" >&2
 fi
