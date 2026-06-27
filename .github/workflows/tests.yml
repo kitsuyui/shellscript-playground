@@ -26,11 +26,12 @@ jobs:
             convert -version | head -1
           fi
 
-      - name: check format with shfmt
-        run: ./tests/shfmt.sh
+      - parallel:
+          - name: check format with shfmt
+            run: ./tests/shfmt.sh
 
-      - name: lint with shellcheck
-        run: ./tests/shellcheck.sh
+          - name: lint with shellcheck
+            run: ./tests/shellcheck.sh
 
-      - name: Test
-        run: ./tests/all.sh
+          - name: Test
+            run: ./tests/all.sh
