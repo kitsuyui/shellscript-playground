@@ -146,6 +146,14 @@ resize_and_convert() {
 get_name_without_extension() {
   local name
   name=$(basename "$1")
+  if [[ "$name" == .* ]]; then
+    local rest="${name#.}"
+    if [[ "$rest" != *.* ]]; then
+      # dotfile with no further extension (e.g., ".gitignore") — return as-is
+      echo "$name"
+      return
+    fi
+  fi
   echo "${name%.*}"
 }
 

@@ -89,4 +89,23 @@ fi
 assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon.ico"
 assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon192.png"
 
+rm -f "$tobe_tarball"
+
+# Test: dotfile input with extension (e.g., ".hidden-icon.png")
+# get_name_without_extension previously returned "" for dotfiles, producing ".tar.gz".
+dotfile_icon="$WORK_DIR/.hidden-icon.png"
+cp "$icon_file" "$dotfile_icon"
+dotfile_tarball=".hidden-icon.tar.gz"
+
+MAGICK_CALL_LOG="$magick_calls" PATH="$fake_bin:$PROJECT_ROOT/bin:/bin:/usr/bin" generate-web-icons "$dotfile_icon"
+
+if [ ! -f "$dotfile_tarball" ]; then
+  echo "Failed: dotfile input did not produce $dotfile_tarball"
+  exit 1
+fi
+
+assert_tar_contains_target_file "$dotfile_tarball" ".hidden-icon/favicon.ico"
+assert_tar_contains_target_file "$dotfile_tarball" ".hidden-icon/favicon192.png"
+rm -f "$dotfile_tarball"
+
 source "$PROJECT_ROOT/tests/teardown.sh"
