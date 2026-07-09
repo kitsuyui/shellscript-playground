@@ -51,6 +51,7 @@ main() {
   local target_file
   local target_name
   local workdir_path
+  local tmp_output
   if [[ $# -ne 1 ]]; then
     echo "Usage: $(basename "$0") <image_file>" >&2
     exit 1
@@ -61,15 +62,15 @@ main() {
     exit 1
   fi
   target_name=$(get_name_without_extension "$target_file")
-  workdir_path=$(generate_icons_in_tmpdir "$target_file")
+  workdir_path=$(create_icons_tmpdir "$target_file")
   tmp_output=$(mktemp "${target_name}.tar.gz.XXXXXX")
-  generate_tarball_name "$target_name" "$workdir_path" >"$tmp_output"
+  write_tarball_to_stdout "$target_name" "$workdir_path" >"$tmp_output"
   mv "$tmp_output" "${target_name}.tar.gz"
   # clean up
   rm -rf "$workdir_path"
 }
 
-generate_icons_in_path() {
+write_icons_to_dir() {
   local target_path="$1"
   local icons_dir="$2"
   resize_and_convert "$target_path" "${icons_dir}/favicon.ico" 16
@@ -91,19 +92,19 @@ generate_icons_in_path() {
   resize_and_convert "$target_path" "${icons_dir}/favicon48.png" 48
   resize_and_convert "$target_path" "${icons_dir}/favicon96.png" 96
   resize_and_convert "$target_path" "${icons_dir}/favicon192.png" 192
-  echo "$icons_dir"
 }
 
-generate_icons_in_tmpdir() {
+create_icons_tmpdir() {
   local target_file="$1"
   local workdir
   workdir=$(mktemp -d)
   trap 'rm -rf "$workdir"' EXIT
-  generate_icons_in_path "$target_file" "$workdir"
+  write_icons_to_dir "$target_file" "$workdir"
   trap - EXIT
+  echo "$workdir"
 }
 
-generate_tarball_name() {
+write_tarball_to_stdout() {
   # BSD tar has -s option, but GNU tar does not
   # GNU tar has --transform option, but BSD tar does not
   # So, we need to use this workaround
