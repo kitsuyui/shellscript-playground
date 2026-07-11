@@ -47,16 +47,33 @@
 
 set -euo pipefail
 
+usage() {
+  echo "Usage: generate-web-icons <image_file>"
+}
+
 main() {
-  local target_file
+  if [[ $# -eq 0 ]]; then
+    usage >&2
+    exit 64
+  fi
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+  fi
+  if [[ $# -ne 1 ]]; then
+    usage >&2
+    exit 64
+  fi
+  case "$1" in
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  esac
+  local target_file="$1"
   local target_name
   local workdir_path
   local tmp_output
-  if [[ $# -ne 1 ]]; then
-    echo "Usage: $(basename "$0") <image_file>" >&2
-    exit 1
-  fi
-  target_file="$1"
   if [[ ! -f "$target_file" ]]; then
     echo "Error: file not found: $target_file" >&2
     exit 1

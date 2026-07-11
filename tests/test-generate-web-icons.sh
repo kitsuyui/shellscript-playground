@@ -18,6 +18,32 @@ assert_tar_contains_target_file() {
 
 set +e
 export PATH="$PROJECT_ROOT/bin:$PRESERVE_PATH"
+
+result=$(generate-web-icons 2>&1)
+status=$?
+if [ "$status" -eq 0 ]; then
+  echo "Failed to reject missing input image"
+  exit 1
+fi
+if [[ "$result" != *"Usage: generate-web-icons <image_file>"* ]]; then
+  echo "Failed to show usage for missing input image"
+  echo "$result"
+  exit 1
+fi
+
+result=$(generate-web-icons --help 2>&1)
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "Failed to show help"
+  echo "$result"
+  exit 1
+fi
+if [[ "$result" != *"Usage: generate-web-icons <image_file>"* ]]; then
+  echo "Failed to show usage for help"
+  echo "$result"
+  exit 1
+fi
+
 result=$(generate-web-icons "$icon_file")
 status=$?
 tobe_tarball="./example-icon.tar.gz"
