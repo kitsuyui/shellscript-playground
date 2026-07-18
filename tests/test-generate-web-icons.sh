@@ -80,6 +80,45 @@ assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon48.png"
 assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon96.png"
 assert_tar_contains_target_file "$tobe_tarball" "example-icon/favicon192.png"
 
+result=$(GENERATE_WEB_ICONS_MAX_INPUT_BYTES=1 generate-web-icons "$icon_file" 2>&1)
+status=$?
+if [ "$status" -eq 0 ]; then
+  echo "Failed to reject oversized file by byte limit"
+  echo "$result"
+  exit 1
+fi
+if [[ "$result" != *"input image is too large"* ]]; then
+  echo "Failed to show oversized file limit message"
+  echo "$result"
+  exit 1
+fi
+
+result=$(GENERATE_WEB_ICONS_MAX_INPUT_DIMENSION=16 generate-web-icons "$icon_file" 2>&1)
+status=$?
+if [ "$status" -eq 0 ]; then
+  echo "Failed to reject oversized image by dimension limit"
+  echo "$result"
+  exit 1
+fi
+if [[ "$result" != *"input image dimensions are too large"* ]]; then
+  echo "Failed to show oversized dimension limit message"
+  echo "$result"
+  exit 1
+fi
+
+result=$(GENERATE_WEB_ICONS_MAX_INPUT_PIXELS=1 generate-web-icons "$icon_file" 2>&1)
+status=$?
+if [ "$status" -eq 0 ]; then
+  echo "Failed to reject oversized image by pixel limit"
+  echo "$result"
+  exit 1
+fi
+if [[ "$result" != *"input image pixel count too large"* ]]; then
+  echo "Failed to show oversized pixel limit message"
+  echo "$result"
+  exit 1
+fi
+
 set -e
 
 rm -f "$tobe_tarball"
@@ -93,6 +132,10 @@ cat >"$fake_bin/magick" <<'BASH'
 set -euo pipefail
 
 printf '%s\n' "$*" >>"$MAGICK_CALL_LOG"
+if [ "$1" = "identify" ]; then
+  printf '16 16\n'
+  exit 0
+fi
 target_file="${@: -1}"
 mkdir -p "$(dirname "$target_file")"
 printf 'fake icon\n' >"$target_file"
@@ -109,6 +152,11 @@ fi
 
 if [ ! -s "$magick_calls" ]; then
   echo "Failed to use magick command"
+  exit 1
+fi
+if ! grep -q '^identify ' "$magick_calls"; then
+  echo "Failed to use magick identify fallback"
+  cat "$magick_calls"
   exit 1
 fi
 

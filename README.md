@@ -34,6 +34,16 @@ If possible, I will write tests.
 `generate-web-icons` supports ImageMagick 7 through `magick` and ImageMagick 6 through `convert`.
 It prefers `magick` when available, and keeps the `convert` fallback while Ubuntu's `imagemagick` package and this repository's CI baseline provide ImageMagick 6.
 
+## generate-web-icons input limits
+
+`generate-web-icons` validates input images before conversion:
+
+- Maximum file size: 50MB (configurable via `GENERATE_WEB_ICONS_MAX_INPUT_BYTES`)
+- Maximum width or height: 4,096 pixels (configurable via `GENERATE_WEB_ICONS_MAX_INPUT_DIMENSION`)
+- Maximum pixel count: 16,777,216 pixels (configurable via `GENERATE_WEB_ICONS_MAX_INPUT_PIXELS`)
+
+If an input image exceeds these bounds, the script exits with a clear error before invoking conversion.
+
 ## Installation
 
 ```bash

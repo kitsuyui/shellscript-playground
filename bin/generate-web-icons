@@ -47,6 +47,10 @@
 
 set -euo pipefail
 
+DEFAULT_MAX_INPUT_BYTES=52428800
+DEFAULT_MAX_INPUT_DIMENSION=4096
+DEFAULT_MAX_INPUT_PIXELS=16777216
+
 usage() {
   echo "Usage: generate-web-icons <image_file>"
 }
@@ -78,6 +82,10 @@ main() {
     echo "Error: file not found: $target_file" >&2
     exit 1
   fi
+  validate_input_image_limits "$target_file" \
+    "${GENERATE_WEB_ICONS_MAX_INPUT_BYTES:-$DEFAULT_MAX_INPUT_BYTES}" \
+    "${GENERATE_WEB_ICONS_MAX_INPUT_DIMENSION:-$DEFAULT_MAX_INPUT_DIMENSION}" \
+    "${GENERATE_WEB_ICONS_MAX_INPUT_PIXELS:-$DEFAULT_MAX_INPUT_PIXELS}"
   target_name=$(get_name_without_extension "$target_file")
   workdir_path=$(create_icons_tmpdir "$target_file")
   tmp_output=$(mktemp "${target_name}.tar.gz.XXXXXX")
@@ -171,6 +179,67 @@ get_name_without_extension() {
     fi
   fi
   echo "${name%.*}"
+}
+
+validate_input_image_limits() {
+  local target_file="$1"
+  local max_bytes="$2"
+  local max_dimension="$3"
+  local max_pixels="$4"
+  local file_size
+  local dimensions
+  local width
+  local height
+  local pixel_count
+
+  file_size=$(wc -c <"$target_file" | tr -d '[:space:]')
+  if ((file_size > max_bytes)); then
+    echo "Error: input image is too large: ${file_size} bytes. Max allowed is ${max_bytes} bytes." >&2
+    exit 1
+  fi
+
+  if ! dimensions=$(identify_image_dimensions "$target_file"); then
+    echo "Error: failed to read image dimensions for ${target_file}" >&2
+    exit 1
+  fi
+
+  read -r width height <<<"$dimensions"
+  if ! [[ "$width" =~ ^[0-9]+$ && "$height" =~ ^[0-9]+$ ]]; then
+    echo "Error: invalid image dimension output: ${dimensions}" >&2
+    exit 1
+  fi
+
+  if ((width > max_dimension || height > max_dimension)); then
+    echo "Error: input image dimensions are too large: ${width}x${height}. Max allowed is ${max_dimension}x${max_dimension}." >&2
+    exit 1
+  fi
+
+  pixel_count=$((width * height))
+  if ((pixel_count > max_pixels)); then
+    echo "Error: input image pixel count too large: ${pixel_count} (width=${width}, height=${height}). Max allowed is ${max_pixels} pixels." >&2
+    exit 1
+  fi
+}
+
+identify_image_dimensions() {
+  local target_file="$1"
+
+  if command -v identify >/dev/null 2>&1; then
+    identify -format "%w %h" "$target_file"
+    return
+  fi
+
+  if command -v magick >/dev/null 2>&1; then
+    magick identify -format "%w %h" "$target_file"
+    return
+  fi
+
+  if command -v convert >/dev/null 2>&1; then
+    convert "$target_file" -format "%w %h" info:
+    return
+  fi
+
+  return 1
 }
 
 main "$@"
