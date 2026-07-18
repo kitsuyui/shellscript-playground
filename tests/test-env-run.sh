@@ -41,6 +41,38 @@ if [[ "$result" != *"Usage: env-run <command> [args...]"* ]]; then
   echo "$result"
   exit 1
 fi
+
+python3 - <<'PY' >.env
+print("BIG=" + "x" * 4097)
+PY
+# shellcheck disable=SC2016
+result=$(env-run sh -c 'echo "$BIG"' 2>&1)
+status=$?
+if [ "$status" -eq 0 ]; then
+  echo "Error: env-run must reject oversized values"
+  exit 1
+fi
+if [[ "$result" != *"env-run: value for BIG is too large"* ]]; then
+  echo "Error: env-run must explain oversized value rejection"
+  echo "$result"
+  exit 1
+fi
+
+python3 - <<'PY' >.env
+for i in range(700):
+    print(f"K{i}=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+PY
+result=$(env-run sh -c 'echo ok' 2>&1)
+status=$?
+if [ "$status" -eq 0 ]; then
+  echo "Error: env-run must reject oversized .env files"
+  exit 1
+fi
+if [[ "$result" != *"env-run: .env is too large"* ]]; then
+  echo "Error: env-run must explain oversized .env rejection"
+  echo "$result"
+  exit 1
+fi
 set -e
 
 source "$PROJECT_ROOT/tests/teardown.sh"

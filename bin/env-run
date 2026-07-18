@@ -5,6 +5,9 @@
 
 set -euo pipefail
 
+readonly ENV_RUN_MAX_ENV_BYTES="${ENV_RUN_MAX_ENV_BYTES:-65536}"
+readonly ENV_RUN_MAX_VALUE_BYTES="${ENV_RUN_MAX_VALUE_BYTES:-4096}"
+
 usage() {
   echo "Usage: env-run <command> [args...]"
 }
@@ -25,6 +28,12 @@ esac
 # Parses KEY=VALUE lines only; arbitrary shell code is not executed.
 # If .env is absent a warning is printed to stderr and the command runs unchanged.
 if [[ -f .env ]]; then
+  env_bytes=$(wc -c <.env | tr -d '[:space:]')
+  if ((env_bytes > ENV_RUN_MAX_ENV_BYTES)); then
+    echo "env-run: .env is too large (${env_bytes} bytes > ${ENV_RUN_MAX_ENV_BYTES} bytes)" >&2
+    exit 65
+  fi
+
   while IFS= read -r line || [[ -n "$line" ]]; do
     [[ "$line" =~ ^[[:space:]]*# ]] && continue
     [[ "$line" =~ ^[[:space:]]*$ ]] && continue
@@ -32,6 +41,10 @@ if [[ -f .env ]]; then
     key="${line%%=*}"
     value="${line#*=}"
     if [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      if ((${#value} > ENV_RUN_MAX_VALUE_BYTES)); then
+        echo "env-run: value for ${key} is too large (${#value} bytes > ${ENV_RUN_MAX_VALUE_BYTES} bytes)" >&2
+        exit 65
+      fi
       export "${key}=${value}"
     fi
   done <.env
