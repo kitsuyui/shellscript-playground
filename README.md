@@ -43,6 +43,15 @@ It prefers `magick` when available, and keeps the `convert` fallback while Ubunt
 
 If either bound is exceeded, `env-run` exits with an error instead of invoking the target command.
 
+## generate-web-icons input limits
+
+`generate-web-icons` validates input images before conversion:
+
+- Maximum file size: 50MB (configurable via `GENERATE_WEB_ICONS_MAX_INPUT_BYTES`)
+- Maximum pixel count: 16,777,216 (16 megapixels, configurable via `GENERATE_WEB_ICONS_MAX_INPUT_PIXELS`)
+
+If an input image exceeds these bounds, the script exits with a clear error before invoking any conversion.
+
 ## Installation
 
 ```bash
