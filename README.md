@@ -34,6 +34,15 @@ If possible, I will write tests.
 `generate-web-icons` supports ImageMagick 7 through `magick` and ImageMagick 6 through `convert`.
 It prefers `magick` when available, and keeps the `convert` fallback while Ubuntu's `imagemagick` package and this repository's CI baseline provide ImageMagick 6.
 
+## env-run input limits
+
+`env-run` reads `.env` from the current working directory and rejects oversized input before exporting it:
+
+- Maximum `.env` size: 65,536 bytes (configurable via `ENV_RUN_MAX_ENV_BYTES`)
+- Maximum value size per variable: 4,096 bytes (configurable via `ENV_RUN_MAX_VALUE_BYTES`)
+
+If either bound is exceeded, `env-run` exits with an error instead of invoking the target command.
+
 ## generate-web-icons input limits
 
 `generate-web-icons` validates input images before conversion:
