@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-source "$PROJECT_ROOT/tests/setup.sh"
+TESTS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=tests/setup.sh
+source "$TESTS_DIR/setup.sh"
 echo "FOO=bar" >.env
 
 set +e
@@ -75,4 +77,5 @@ if [[ "$result" != *"env-run: .env is too large"* ]]; then
 fi
 set -e
 
-source "$PROJECT_ROOT/tests/teardown.sh"
+# shellcheck source=tests/teardown.sh
+source "$TESTS_DIR/teardown.sh"
