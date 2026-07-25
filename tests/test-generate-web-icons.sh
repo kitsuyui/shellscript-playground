@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+TESTS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 PRESERVE_PATH="$PATH"
-source "$PROJECT_ROOT/tests/setup.sh"
+# shellcheck source=tests/setup.sh
+source "$TESTS_DIR/setup.sh"
 
 # Get example .png icon file
 icon_file="$PROJECT_ROOT/assets/icons/example-icon.png"
@@ -164,4 +166,5 @@ assert_tar_contains_target_file "$dotfile_tarball" ".hidden-icon/favicon.ico"
 assert_tar_contains_target_file "$dotfile_tarball" ".hidden-icon/favicon192.png"
 rm -f "$dotfile_tarball"
 
-source "$PROJECT_ROOT/tests/teardown.sh"
+# shellcheck source=tests/teardown.sh
+source "$TESTS_DIR/teardown.sh"
