@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: pollenjp/setup-shfmt@2d2d74023ad2fb047734b97658e911e49f4dfc73
+      - uses: pollenjp/setup-shfmt@7430dea5368781638ecefba71577497a79866d8a
 
       - name: Install ImageMagick for generate-web-icons
         run: |
